@@ -1,6 +1,15 @@
 import re
 from collections import defaultdict
 from nltk.corpus import stopwords 
+from random import shuffle
+def getstopwords():
+	a = stopwords.words('english')
+	a.append('one')
+	a.append('two')
+	a.append('amp')
+	a.append('best')
+
+	return a 
 def proc(a):
 	a = a.lower().split('\n')
 	res = []
@@ -9,15 +18,18 @@ def proc(a):
 			break
 		d = {}	
 		i = i.split()
-		i = [w for w in i if w not in stopwords.words('english')]
+		i = [w for w in i if w not in getstopwords()]
 		j = 0
-		while j < len(i):
-			if re.match(r"http://",i[j]):
-				del(i[j])
-			j +=1
 		d['twitid'] = i[0]
 		d['category'] = i[1]
-		d['data'] = i[2:]
+		del(i[0])
+		del(i[1])
+		while j < len(i):
+			i[j] = i[j].strip(r'&\'\"-_\.:()!,;')
+			if re.search(r"(http://)|(rt)",i[j]):
+				del(i[j])
+			j +=1
+		d['data'] = i
 		res.append(d)
 	return res
 def train(data):
@@ -25,8 +37,7 @@ def train(data):
 	for d in data:
 		for a in d['data']:
 			f = {}
-			g = {}
-			flag = 1
+			g = {}		
 			for temp in r:
 				if temp['word'] == a:
 					if temp['count'].get(d['category'],None):
@@ -55,18 +66,31 @@ def validate(s):
 				if p:
 					pc += p.get('politics',0)
 					sc += p.get('sports',0)
+					print word, pc ,sc
 	if pc > sc :
 		return 'politics'
 	else:
 		return 'sports'
 trdata = proc(open('training.txt','r').read())
-a = len(trdata)*7/8
+a = len(trdata)*49/50
+shuffle(trdata)
 features = train(trdata[:a])
 c = 0
 nc = 0
+'''
+print '#'*80
+print 'Word \t\tPolitics\t\tSports'
+print '#'*80
+features.sort()
+for f in features:
+	p = f['count']
+	print "%s\t\t%s\t\t%s\t\t"%(f['word'],p.get('politics',0),p.get('sports',0))
+'''
 for i in trdata[a:]:
-	if validate(' '.join(i['data'])) == i['category'].lower():
+	if validate(' '.join(i['data'])) == i['category']:
 		c += 1
 	else:
 		nc += 1
+		print i
 print c, nc
+print 'correctness = %s' %((100*c)/(c+nc))
