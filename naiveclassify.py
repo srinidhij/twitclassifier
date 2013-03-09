@@ -43,8 +43,6 @@ def train(data):
 				f['count'] = g
 				r.append(f)
 	return r			
-trdata = proc(open('training.txt','r').read())
-features = train(trdata)
 def validate(s):
 	global features
 	pc = 0
@@ -52,13 +50,23 @@ def validate(s):
 	s = s.lower().split()
 	for f in features:
 		for word in s:
-			if f['word'] == s:
+			if f['word'] == word:
 				p = f.get('count',None)
 				if p:
 					pc += p.get('politics',0)
 					sc += p.get('sports',0)
 	if pc > sc :
-		print 'Politics'
+		return 'politics'
 	else:
-		print 'Sports'
-validate("Haha, check out the spat between @davidwarner31 and @brettygeevz. Brilliant. RT and embarrass all involved #ausveng")
+		return 'sports'
+trdata = proc(open('training.txt','r').read())
+a = len(trdata)*7/8
+features = train(trdata[:a])
+c = 0
+nc = 0
+for i in trdata[a:]:
+	if validate(' '.join(i['data'])) == i['category'].lower():
+		c += 1
+	else:
+		nc += 1
+print c, nc
