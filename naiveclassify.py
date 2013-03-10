@@ -8,7 +8,7 @@ def getstopwords():
 	a.append('two')
 	a.append('amp')
 	a.append('best')
-
+	a.append('the')
 	return a 
 def proc(a):
 	a = a.replace('\\u2019','\'')
@@ -63,6 +63,7 @@ def validate(w):
 	pc = 0
 	sc = 0
 	w = w.lower().split()
+	w = [word for word in w if word not in getstopwords()]
 	ser = ''
 	for feature in features:
 		for word in w:
@@ -94,6 +95,8 @@ shuffle(trdata)
 features = train(trdata[:a])
 c = 0
 nc = 0
+
+#print validate("With four quality bowlers who can hurl the ball consistently at 140+kph Australia need not really worry about the nature of the pitch...")
 '''
 print '#'*80
 print 'Word \t\tPolitics\t\tSports'
