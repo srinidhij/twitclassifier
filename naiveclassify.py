@@ -26,7 +26,7 @@ def proc(a):
 		del(i[1])
 		while j < len(i):
 			i[j] = i[j].strip(r'&\'\"-_\.:()!,;')
-			if re.search(r"(http://)|(rt)",i[j]):
+			if re.match(r"(http://)|(rt)",i[j]):
 				del(i[j])
 			j +=1
 		d['data'] = i
@@ -72,7 +72,7 @@ def validate(s):
 	else:
 		return 'sports'
 trdata = proc(open('training.txt','r').read())
-a = len(trdata)*49/50
+a = len(trdata)*5/6
 shuffle(trdata)
 features = train(trdata[:a])
 c = 0
