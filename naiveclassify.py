@@ -66,7 +66,10 @@ def validate(w):
 	ser = ''
 	for feature in features:
 		for word in w:
+			flag = 0 
 			if feature['word'] == word:
+				if re.match(r"(#)|(@)",word):
+					flag = 1
 				ser += '%s :: '%(word)
 				c = feature.get('count',None)
 				if c:
@@ -74,6 +77,9 @@ def validate(w):
 					s = c.get('sports',0)
 					pc += p
 					sc += s
+					if flag == 1 :
+						pc += 999*p
+						sc += 999*s
 					ser += 'Pol : %s\t\tSports: %s\n'%(p,s)
 					print word, p ,s
 	f.write(ser)
