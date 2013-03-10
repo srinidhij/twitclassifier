@@ -20,19 +20,21 @@ def proc(a):
 		d = {}	
 		i = i.split()
 		i = [w for w in i if w not in getstopwords()]
-		j = 0
 		d['twitid'] = i[0]
 		d['category'] = i[1]
 		del(i[0])
 		del(i[0])
+		j = 0
 		while j < len(i):
-			i[j] = i[j].strip(r'&\'\"-_\.:()!,;\|=')
+			i[j] = i[j].strip(r"!\$%\^&\*();:'\"\.,-_")
 			if re.match(r"(http://)|(rt)",i[j]):
 				del(i[j])
-			j +=1
+			j += 1
+		#i = re.findall("[a-z#@\\d]+",' '.join(i))
 		d['data'] = i
 		res.append(d)
 	return res
+
 def train(data):
 	r = []
 	for d in data:
@@ -73,7 +75,7 @@ def validate(w):
 					pc += p
 					sc += s
 					ser += 'Pol : %s\t\tSports: %s\n'%(p,s)
-					print word, pc ,sc
+					print word, p ,s
 	f.write(ser)
 	f.close()
 	if pc > sc :
@@ -104,7 +106,8 @@ for i in trdata[a:]:
 		st += '%s\t\t::%s\n'%(i['category'],' '.join(i['data']))
 		print i
 print c, nc
-print 'correctness = %s' %((100*c)/(c+nc))
+cr = float(100*c)/float(c+nc)
+print 'correctness = %s' %(cr)
 f = open("notcorrect.txt","w")
 f.write(st)
 f.close()
