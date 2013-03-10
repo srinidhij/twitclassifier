@@ -11,6 +11,7 @@ def getstopwords():
 
 	return a 
 def proc(a):
+	a = a.replace('\\u2019','\'')
 	a = a.lower().split('\n')
 	res = []
 	for i in a :
@@ -23,9 +24,9 @@ def proc(a):
 		d['twitid'] = i[0]
 		d['category'] = i[1]
 		del(i[0])
-		del(i[1])
+		del(i[0])
 		while j < len(i):
-			i[j] = i[j].strip(r'&\'\"-_\.:()!,;')
+			i[j] = i[j].strip(r'&\'\"-_\.:()!,;\|=')
 			if re.match(r"(http://)|(rt)",i[j]):
 				del(i[j])
 			j +=1
@@ -54,25 +55,33 @@ def train(data):
 				f['count'] = g
 				r.append(f)
 	return r			
-def validate(s):
+def validate(w):
+	f = open("features.txt","a")
 	global features
 	pc = 0
 	sc = 0
-	s = s.lower().split()
-	for f in features:
-		for word in s:
-			if f['word'] == word:
-				p = f.get('count',None)
-				if p:
-					pc += p.get('politics',0)
-					sc += p.get('sports',0)
+	w = w.lower().split()
+	ser = ''
+	for feature in features:
+		for word in w:
+			if feature['word'] == word:
+				ser += '%s :: '%(word)
+				c = feature.get('count',None)
+				if c:
+					p = c.get('politics',0)
+					s = c.get('sports',0)
+					pc += p
+					sc += s
+					ser += 'Pol : %s\t\tSports: %s\n'%(p,s)
 					print word, pc ,sc
+	f.write(ser)
+	f.close()
 	if pc > sc :
 		return 'politics'
 	else:
 		return 'sports'
 trdata = proc(open('training.txt','r').read())
-a = len(trdata)*5/6
+a = len(trdata)*49/50
 shuffle(trdata)
 features = train(trdata[:a])
 c = 0
@@ -86,11 +95,16 @@ for f in features:
 	p = f['count']
 	print "%s\t\t%s\t\t%s\t\t"%(f['word'],p.get('politics',0),p.get('sports',0))
 '''
+st = ''
 for i in trdata[a:]:
 	if validate(' '.join(i['data'])) == i['category']:
 		c += 1
 	else:
 		nc += 1
+		st += '%s\t\t::%s\n'%(i['category'],' '.join(i['data']))
 		print i
 print c, nc
 print 'correctness = %s' %((100*c)/(c+nc))
+f = open("notcorrect.txt","w")
+f.write(st)
+f.close()
