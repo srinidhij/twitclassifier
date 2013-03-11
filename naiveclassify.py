@@ -1,14 +1,10 @@
+#!/usr/bin/env python
 import re
 from collections import defaultdict
 from nltk.corpus import stopwords 
 from random import shuffle
 def getstopwords():
-	a = stopwords.words('english')
-	a.append('one')
-	a.append('two')
-	a.append('amp')
-	a.append('best')
-	a.append('the')
+	a = stopwords.words('english') + ['one','two','amp','best','the']
 	return a 
 def proc(a):
 	a = a.replace('\\u2019','\'')
@@ -30,7 +26,6 @@ def proc(a):
 			if re.match(r"(http://)|(rt)",i[j]):
 				del(i[j])
 			j += 1
-		#i = re.findall("[a-z#@\\d]+",' '.join(i))
 		d['data'] = i
 		res.append(d)
 	return res
@@ -90,7 +85,7 @@ def validate(w):
 	else:
 		return 'sports'
 trdata = proc(open('training.txt','r').read())
-a = len(trdata)*49/50
+a = len(trdata)*19/20
 shuffle(trdata)
 features = train(trdata[:a])
 c = 0
