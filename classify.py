@@ -6,7 +6,12 @@ from random import shuffle
 def getstopwords():
 	a = stopwords.words('english') + ['one','two','amp','best','the','once','twice','nine','it\'s']
 	return a 
+
 def proc(a,flag=0):
+	'''process text : takes the entire file content as 
+	input and returns a list of form [{twitid:'2352514364257',category:'Politics',
+	data:['fasd','asdf','g', 'dfg','dsg '}.....]'''
+	#flag = 0 only for training data
 	a = a.replace('\\u2019','\'')
 	a = a.lower().split('\n')
 	res = []
@@ -18,6 +23,7 @@ def proc(a,flag=0):
 		i = [w for w in i if w not in getstopwords()]
 		d['twitid'] = i[0]
 		if flag == 0:
+			#Training data
 			d['category'] = i[1]
 			del(i[0])
 			del(i[0])
@@ -26,7 +32,7 @@ def proc(a,flag=0):
 		j = 0
 		while j < len(i):
 			i[j] = i[j].strip(r"!\$%\^&\*();:'\"\.,-_")
-			i[j].replace('\\u2019','\'')
+			i[j] = i[j].replace('\\u2019','\'')
 			if re.match(r"(http://)|(rt)|(\\u2013)",i[j]):
 				del(i[j])
 			j += 1
@@ -35,6 +41,7 @@ def proc(a,flag=0):
 	return res
 
 def train(data):
+	'''Creates a list of features of the form [{word:'asdfba',count:{politics:10,sports:0}}]'''
 	r = []
 	for d in data:
 		for a in d['data']:
@@ -56,7 +63,9 @@ def train(data):
 				f['count'] = g
 				r.append(f)
 	return r			
+
 def validate(w):
+	'''Validates based on word count present in features'''
 	f = open("features.txt","a")
 	global features
 	pc = 0
@@ -120,7 +129,7 @@ f = open("notcorrect.txt","w")
 f.write(st)
 f.close()
 '''
-valdata = proc(open('validation.txt','r').read())
+valdata = proc(open('validation.txt','r').read(),flag=1)
 f = open('output.txt','w')
 for v in valdata:
 	st = v['twitid'] +'\t'+ validate(' '.join(v['data']))+'\n'
