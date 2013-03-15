@@ -17,14 +17,14 @@ def proc(twitdat,flag=0):
 	twitdat = twitdat.lower().split('\n')
 	result = []
 	for dat in twitdat :
-		if len(i) < 3 :
+		if len(dat) < 3 :
 			return 
 		tempdict = {}	
 		dat = dat.split()
-		dat = [w for w in i if w not in swords]
-		tempdict['twitid'] = i[0]
+		dat = [w for w in dat if w not in swords]
+		tempdict['twitid'] = dat[0]
 		if flag == 0:
-			tempdict['category'] = i[1]
+			tempdict['category'] = dat[1]
 			del(dat[0])
 			del(dat[0])
 		else:
@@ -35,7 +35,7 @@ def proc(twitdat,flag=0):
 			if re.match(r"(http://)|(rt)",dat[j]):
 				del(dat[j])
 			j += 1
-		tempdict['data'] = i
+		tempdict['data'] = dat
 		result.append(tempdict)
 		return tempdict
 	return result
